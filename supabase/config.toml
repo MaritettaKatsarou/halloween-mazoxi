@@ -1,0 +1,11 @@
+project_id = "halloween-mazoxi"
+
+[auth]
+enabled = true
+enable_anonymous_sign_ins = true
+
+[functions.guest-ticket]
+# The handler verifies every bearer token with Auth.getUser (including ES256).
+# No request can reach the privileged RPC without this check.
+verify_jwt = false
+entrypoint = "./functions/guest-ticket/index.ts"

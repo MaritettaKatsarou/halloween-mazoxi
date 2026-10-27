@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "types": ["deno"] },
+  "include": ["supabase/functions/**/*.ts"]
+}

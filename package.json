@@ -1,0 +1,48 @@
+{
+  "name": "halloween-mazoxi",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.edge.json && tsc -p tsconfig.tests.json",
+    "test": "vitest run",
+    "test:live": "node scripts/test-live.mjs",
+    "artwork:check": "node scripts/check-artwork.mjs",
+    "lint": "eslint .",
+    "build": "npm run artwork:check && npm run typecheck && vite build",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "2.118.0",
+    "motion": "^14.6.0",
+    "qrcode.react": "4.2.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.12",
+    "@eslint/js": "^10.0.1",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/deno": "2.7.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "eslint": "^10.13.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "globals": "^17.13.0",
+    "jsqr": "1.4.0",
+    "sharp": "0.35.5",
+    "supabase": "2.122.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vite": "^8.3.5",
+    "vitest": "5.0.5"
+  },
+  "private": true,
+  "type": "module"
+}
