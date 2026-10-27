@@ -22,6 +22,7 @@ export type Database = {
           id: string
           owner_id: string
           redeemed_at: string | null
+          redeemed_by: string | null
           status: string
         }
         Insert: {
@@ -31,6 +32,7 @@ export type Database = {
           id?: string
           owner_id: string
           redeemed_at?: string | null
+          redeemed_by?: string | null
           status?: string
         }
         Update: {
@@ -40,6 +42,7 @@ export type Database = {
           id?: string
           owner_id?: string
           redeemed_at?: string | null
+          redeemed_by?: string | null
           status?: string
         }
         Relationships: []
@@ -49,6 +52,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_ticket_action: {
+        Args: { p_action: string; p_admin: string; p_credential?: string }
+        Returns: Json
+      }
       issue_guest_ticket: {
         Args: { p_create?: boolean; p_owner: string }
         Returns: Json

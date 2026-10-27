@@ -2,11 +2,11 @@ import { useRef } from 'react'
 import type { PointerEvent } from 'react'
 import { useAnimationFrame, useMotionValue, useReducedMotion } from 'motion/react'
 
-export function useTicketRotation(stable: boolean, paused: boolean) {
+export function useTicketRotation(stable: boolean, paused: boolean, initiallyStable = false) {
   const reduced = useReducedMotion()
-  const rotateX = useMotionValue(-9)
-  const rotateY = useMotionValue(-12)
-  const rotateZ = useMotionValue(40)
+  const rotateX = useMotionValue(initiallyStable ? 0 : -9)
+  const rotateY = useMotionValue(initiallyStable ? 0 : -12)
+  const rotateZ = useMotionValue(initiallyStable ? 0 : 40)
   const gesture = useRef({ active: false, x: 0, y: 0, vx: 0, vy: 0, time: 0 })
   useAnimationFrame((_, delta) => {
     const dt = Math.min(delta, 32) / 1000
@@ -38,6 +38,7 @@ export function useTicketRotation(stable: boolean, paused: boolean) {
     },
     onPointerMove: (e: PointerEvent<HTMLDivElement>) => {
       const g = gesture.current
+      if (stable || reduced) { g.active = false; return }
       if (!g.active) return
       const dx = e.clientX - g.x, dy = e.clientY - g.y
       const elapsed = Math.max(8, e.timeStamp - g.time) / 1000

@@ -9,3 +9,8 @@ enable_anonymous_sign_ins = true
 # No request can reach the privileged RPC without this check.
 verify_jwt = false
 entrypoint = "./functions/guest-ticket/index.ts"
+
+[functions.admin-ticket]
+# Every request is verified with getUser plus a fresh private DB allowlist check.
+verify_jwt = false
+entrypoint = "./functions/admin-ticket/index.ts"

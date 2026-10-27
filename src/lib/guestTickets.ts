@@ -17,10 +17,12 @@ async function callGuestTicket(client: SupabaseClient<Database>, action: 'lookup
   return withSessionLock(async () => {
     const { data, error } = await client.auth.getSession()
     if (error) throw new Error('Δεν ήταν δυνατή η επαναφορά της συνεδρίας. Δοκίμασε ξανά.')
+    let ownerId = data.session?.user.id
     if (!data.session) {
       if (action === 'lookup') return null
-      const { error: signInError } = await client.auth.signInAnonymously()
+      const { data: signedIn, error: signInError } = await client.auth.signInAnonymously()
       if (signInError) throw new Error('Η σύνδεση επισκέπτη απέτυχε. Έλεγξε τη σύνδεσή σου και δοκίμασε ξανά.')
+      ownerId = signedIn.session?.user.id
     }
     const invoke = () => client.functions.invoke('guest-ticket', { body: { action }, timeout: 20000 })
     let result = await invoke()
@@ -30,7 +32,12 @@ async function callGuestTicket(client: SupabaseClient<Database>, action: 'lookup
       result = await invoke()
     }
     if (result.error) throw new Error('Δεν ήταν δυνατή η φόρτωση του εισιτηρίου. Δοκίμασε ξανά· η ίδια συνεδρία διατηρεί το εισιτήριό σου.')
-    return parseGuestTicket(result.data?.ticket)
+    const ticket = parseGuestTicket(result.data?.ticket)
+    const current = await client.auth.getSession()
+    if (current.error || !ownerId || current.data.session?.user.id !== ownerId || (ticket && ticket.ownerId !== ownerId)) {
+      throw new Error('Η συνεδρία άλλαξε. Φόρτωσε ξανά το εισιτήριό σου.')
+    }
+    return ticket
   })
 }
 

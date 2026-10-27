@@ -18,8 +18,8 @@ describe('guest client session and duplicate request handling', () => {
     expect(mocks.invoke).not.toHaveBeenCalled()
   })
   it('coalesces double-clicks, creates one anonymous session and returns the verified ticket', async () => {
-    mocks.getSession.mockResolvedValue({ data: { session: null }, error: null })
-    mocks.signInAnonymously.mockResolvedValue({ error: null })
+    mocks.getSession.mockResolvedValueOnce({ data: { session: null }, error: null }).mockResolvedValue({ data: { session: { user: { id: 'owner' } } }, error: null })
+    mocks.signInAnonymously.mockResolvedValue({ data: { session: { user: { id: 'owner' } } }, error: null })
     mocks.invoke.mockResolvedValue({ data: { ticket: returnedTicket }, error: null })
     const { claimGuestTicket } = await import('../src/lib/guestTickets')
     const [a, b] = await Promise.all([claimGuestTicket(), claimGuestTicket()])
