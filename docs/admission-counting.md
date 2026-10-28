@@ -1,5 +1,7 @@
 # Admission counting baseline
 
+Superseded metric semantics: V2 resets Generated, Admitted and Waiting for the current period and moves lifetime totals plus frozen archives to the dedicated History route. See [counting-periods.md](counting-periods.md). The notes below describe the original admission-only baseline implementation.
+
 RESET COUNT changes only the dashboard's counting window. It never deletes a ticket, updates a redeemed status, reissues a credential, changes a redemption timestamp or alters the guest admission animation.
 
 ## At the door

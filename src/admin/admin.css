@@ -44,3 +44,17 @@
 .admin-reset-dialog h2 { margin: 12px 0 20px; font: 27px/1.2 Georgia, serif; color: #e2c6b4; }
 .admin-reset-dialog p { font-size: 12px; line-height: 1.8; color: #ded0d7; }
 .admin-reset-dialog>.eyebrow, .admin-reset-dialog .eyebrow { color: #d5b09b; font-size: 8px; letter-spacing: .16em; }
+.admin-history-page h1 { font-size: clamp(30px, 6vw, 46px); white-space: normal; }
+.period-card { padding: 20px 0; border-top: 1px solid #c5aabd40; }
+.period-card>.eyebrow { color: #d5b09b; }
+.period-closed { font-size: 12px; line-height: 1.8; color: #ded0d7; }
+.period-counts { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin: 20px 0; }
+.period-counts dt { color: #cbb9c3; font-size: 10px; }
+.period-counts dd { margin: 8px 0 0; font: 30px Georgia,serif; color: #e2c6b4; }
+.period-counts.unavailable dd { font: 11px/1.5 var(--font-sans); color: #cbb9c3; }
+.period-details>summary { cursor: pointer; min-height: 44px; padding: 14px 0; font-size: 11px; color: #e2c6b4; }
+.period-metadata { font-size: 11px; line-height: 1.8; }
+.period-metadata>div { padding: 8px 0; border-bottom: 1px solid #c5aabd26; }
+.period-metadata dt { color: #bda9b6; }
+.period-metadata dd { margin: 4px 0 0; overflow-wrap: anywhere; }
+@media(max-width:450px) { .admin-nav { gap: 16px; font-size: 11px; }.admin-nav button { padding-left: 0; }.admin-table-wrap table { font-size: 11px; }.admin-table-wrap th,.admin-table-wrap td { padding-inline: 5px; } }

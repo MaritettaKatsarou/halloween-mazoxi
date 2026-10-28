@@ -64,6 +64,10 @@ export type Database = {
         Args: { p_admin: string; p_before?: string; p_before_id?: string }
         Returns: Json
       }
+      admin_counting_history: {
+        Args: { p_admin: string; p_before_id?: number }
+        Returns: Json
+      }
       issue_guest_ticket: {
         Args: { p_create?: boolean; p_owner: string }
         Returns: Json

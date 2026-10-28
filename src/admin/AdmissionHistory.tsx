@@ -24,11 +24,11 @@ export function AdmissionHistory({ onAccessDenied }: { onAccessDenied: () => voi
     } finally { pending.current = false; setLoading(false) }
   }
   return <details className="dashboard-history" onToggle={event => { if (event.currentTarget.open && !data) void load() }}>
-    <summary>All-time admission history &amp; reset audit</summary>
+    <summary>Detailed admission history · all time</summary>
     <p className="admin-hint">Every admission is preserved. Load earlier arrivals to browse the complete history. Times use Europe/Athens.</p>
     {data && <><ArrivalList items={data.items} />{!data.items.length && <p className="admin-hint">No admissions recorded.</p>}
       {data.nextCursor && <button className="admin-secondary" disabled={loading} onClick={() => void load(true)}>LOAD EARLIER ARRIVALS</button>}
-      <h3>Latest 20 counting resets</h3>{data.resets.length ? <ol className="reset-audit">{data.resets.map(reset => <li key={reset.id}><time dateTime={reset.baselineAt}>{admissionTime(reset.baselineAt)}</time><small>Reset #{reset.id} · Admin {reset.resetBy}</small></li>)}</ol> : <p className="admin-hint">No counting reset has been performed.</p>}</>}
+      </>}
     {loading && <p className="admin-hint" role="status">Loading history…</p>}{error && <p className="admin-error" role="alert">{error} <button className="admin-secondary" disabled={loading} onClick={() => void load(!!data?.nextCursor)}>RETRY HISTORY</button></p>}
   </details>
 }

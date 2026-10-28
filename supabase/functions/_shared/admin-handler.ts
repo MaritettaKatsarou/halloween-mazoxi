@@ -5,8 +5,8 @@ export type AdminTicket = {
 export type AdmissionResult = { result: 'INVALID' } | { result: 'VALID' | 'ADMITTED' | 'ALREADY_USED'; ticket: AdminTicket }
 export type AdminDashboard = {
   total: number; admitted: number; remaining: number
-  baselineAt: string | null; lifetimeAdmitted: number
-  distribution: { editionId: string; total: number; admitted: number }[]
+  baselineAt: string | null; lifetimeAdmitted: number; lifetimeGenerated: number; lifetimeRemaining: number
+  distribution: { editionId: string; total: number; admitted: number; remaining: number }[]
   recent: Pick<AdminTicket, 'id' | 'editionId' | 'displayNumber' | 'redeemedAt' | 'redeemedBy'>[]
 }
 export type HistoryCursor = { redeemedAt: string; id: string }
@@ -14,9 +14,12 @@ export type AdminHistory = {
   items: AdminDashboard['recent']; nextCursor: HistoryCursor | null
   resets: { id: string; baselineAt: string; resetBy: string }[]
 }
-export type ResetCountResult = { baselineAt: string; resetId: string }
-export type AdminAction = 'session' | 'dashboard' | 'validate' | 'admit' | 'reset-count' | 'history'
-export type AdminOperationOptions = { requestId?: string; cursor?: HistoryCursor }
+export type PeriodSnapshot = Pick<AdminDashboard, 'total' | 'admitted' | 'remaining' | 'distribution' | 'lifetimeGenerated' | 'lifetimeAdmitted' | 'lifetimeRemaining'>
+export type ClosedPeriod = { id: string; closedAt: string; resetBy: string; periodStart: string | null; snapshot: PeriodSnapshot | null }
+export type CountingHistory = { periods: ClosedPeriod[]; nextBeforeId: string | null; lifetime: { generated: number; admitted: number; outstanding: number } }
+export type ResetCountResult = { baselineAt: string; resetId: string; period: AdminDashboard }
+export type AdminAction = 'session' | 'dashboard' | 'validate' | 'admit' | 'reset-count' | 'history' | 'periods'
+export type AdminOperationOptions = { requestId?: string; cursor?: HistoryCursor; beforeId?: string }
 export type AdminDependencies = {
   authenticate: (token: string) => Promise<{ id: string; permanent: boolean } | null>
   execute: (adminId: string, action: AdminAction, credential?: string, options?: AdminOperationOptions) => Promise<unknown>
@@ -46,13 +49,19 @@ export function createAdminHandler(dependencies: AdminDependencies) {
       if (Number(request.headers.get('Content-Length') || 0) > 256) return respond({ error: 'Invalid request' }, 400)
       const text = await request.text()
       if (text.length > 256) return respond({ error: 'Invalid request' }, 400)
-      let body: { action?: AdminAction; credential?: string; requestId?: string; cursor?: HistoryCursor }
+      let body: { action?: AdminAction; credential?: string; requestId?: string; cursor?: HistoryCursor; beforeId?: string }
       try { body = JSON.parse(text) } catch { return respond({ error: 'Invalid request' }, 400) }
-      if (!body || typeof body !== 'object' || Array.isArray(body) || Object.keys(body).some(key => !['action', 'credential', 'requestId', 'cursor'].includes(key))
-        || !['session', 'dashboard', 'validate', 'admit', 'reset-count', 'history'].includes(body.action || '')) {
+      if (!body || typeof body !== 'object' || Array.isArray(body) || Object.keys(body).some(key => !['action', 'credential', 'requestId', 'cursor', 'beforeId'].includes(key))
+        || !['session', 'dashboard', 'validate', 'admit', 'reset-count', 'history', 'periods'].includes(body.action || '')) {
         return respond({ error: 'Invalid request' }, 400)
       }
       const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      if (body.action === 'periods') {
+        if (body.credential !== undefined || body.requestId !== undefined || body.cursor !== undefined || body.beforeId !== undefined &&
+          (typeof body.beforeId !== 'string' || !/^[1-9]\d{0,18}$/.test(body.beforeId) || BigInt(body.beforeId) > 9223372036854775807n)) return respond({ error: 'Invalid period cursor' }, 400)
+        return respond(await dependencies.execute(user.id, 'periods', undefined, body.beforeId ? { beforeId: body.beforeId } : {}))
+      }
+      if (body.beforeId !== undefined) return respond({ error: 'Invalid request' }, 400)
       if (body.action === 'reset-count') {
         if (typeof body.requestId !== 'string' || !uuid.test(body.requestId) || body.credential !== undefined || body.cursor !== undefined) return respond({ error: 'Invalid reset request' }, 400)
         return respond(await dependencies.execute(user.id, 'reset-count', undefined, { requestId: body.requestId }))

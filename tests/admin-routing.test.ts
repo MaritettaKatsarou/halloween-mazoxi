@@ -3,7 +3,7 @@ import { resolveRoute } from '../src/routing'
 import { createScanLatch } from '../src/admin/scanLatch'
 describe('static admin routes and scanner latch', () => {
   it('supports hash routes and direct admin links under the GitHub Pages base', () => {
-    for (const route of ['login', 'scan', 'dashboard']) {
+    for (const route of ['login', 'scan', 'dashboard', 'history']) {
       expect(resolveRoute(`#/admin/${route}`, '/halloween-mazoxi/', '/halloween-mazoxi/')).toBe(`/admin/${route}`)
       expect(resolveRoute('', `/halloween-mazoxi/admin/${route}`, '/halloween-mazoxi/')).toBe(`/admin/${route}`)
     }

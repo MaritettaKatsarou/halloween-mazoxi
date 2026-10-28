@@ -67,4 +67,14 @@ describe('admin Edge trust boundary', () => {
       expect((await handler(request({ action: 'history', cursor: value }))).status).toBe(400)
     }
   })
+  it('protects period history and rejects invalid or cross-action pagination fields', async () => {
+    const execute = vi.fn<AdminDependencies['execute']>(async () => ({}))
+    const handler = createAdminHandler({ authenticate: async () => ({ id: 'admin', permanent: true }), execute })
+    expect((await handler(request({ action: 'periods', beforeId: '21' }))).status).toBe(200)
+    expect(execute).toHaveBeenLastCalledWith('admin', 'periods', undefined, { beforeId: '21' })
+    for (const beforeId of ['0', '-1', 'abc', '9223372036854775808', 2, null]) expect((await handler(request({ action: 'periods', beforeId }))).status).toBe(400)
+    expect((await handler(request({ action: 'reset-count', requestId: '00000000-0000-4000-8000-000000000001', beforeId: '1' }))).status).toBe(400)
+    const guest = createAdminHandler({ authenticate: async () => ({ id: 'guest', permanent: false }), execute })
+    expect((await guest(request({ action: 'periods' }))).status).toBe(403)
+  })
 })

@@ -14,6 +14,8 @@ Deno.serve(createAdminHandler({
   async execute(adminId, action, credential, options) {
     const { data, error } = action === 'reset-count'
       ? await backend.rpc('reset_admission_count', { p_admin: adminId, p_request_id: options!.requestId })
+      : action === 'periods'
+      ? await backend.rpc('admin_counting_history', { p_admin: adminId, p_before_id: options?.beforeId ?? null })
       : action === 'history'
       ? await backend.rpc('admin_admission_history', { p_admin: adminId,
         p_before: options?.cursor?.redeemedAt ?? null, p_before_id: options?.cursor?.id ?? null })

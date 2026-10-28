@@ -139,9 +139,10 @@ describe('persistent admission counting baseline (disposable local fixtures only
     expect((await db.query('select * from private.ticket_credentials order by ticket_id')).rows).toEqual(credentials)
     const dashboard = await action<AdminDashboard>(admin, 'dashboard')
     expect(dashboard.baselineAt).toBe(initialReset.baselineAt)
-    expect([dashboard.total, dashboard.admitted, dashboard.lifetimeAdmitted, dashboard.remaining]).toEqual([12, 0, 2, 10])
+    expect([dashboard.total, dashboard.admitted, dashboard.lifetimeAdmitted, dashboard.remaining]).toEqual([0, 0, 2, 0])
+    expect([dashboard.lifetimeGenerated, dashboard.lifetimeRemaining]).toEqual([12, 10])
     expect(dashboard.recent).toEqual([])
-    expect(dashboard.distribution.reduce((sum, row) => sum + row.total, 0)).toBe(12)
+    expect(dashboard.distribution.reduce((sum, row) => sum + row.total, 0)).toBe(0)
     expect(dashboard.distribution.every(row => row.admitted === 0)).toBe(true)
     const audit = (await db.query<{ reset_by: string }>('select reset_by from private.admission_count_resets')).rows
     expect(audit).toEqual([{ reset_by: admin }])
@@ -152,7 +153,8 @@ describe('persistent admission counting baseline (disposable local fixtures only
       expect((await action<AdmissionResult>(admin, 'admit', credentials[index])).result).toBe('ADMITTED')
       const dashboard = await action<AdminDashboard>(admin, 'dashboard')
       expect(dashboard.admitted).toBe(expected)
-      expect(dashboard.remaining).toBe(10 - expected)
+      expect(dashboard.remaining).toBe(0)
+      expect(dashboard.lifetimeRemaining).toBe(10 - expected)
       expect(dashboard.recent).toHaveLength(expected)
       expect(dashboard.distribution.reduce((sum, row) => sum + row.admitted, 0)).toBe(expected)
     }
@@ -164,7 +166,7 @@ describe('persistent admission counting baseline (disposable local fixtures only
     expect((await history()).items).toHaveLength(4)
   })
   it('idempotent retry does not advance the baseline or discard arrivals; further resets retain the audit trail', async () => {
-    expect(await reset(admin, nonce)).toEqual(initialReset)
+    expect(await reset(admin, nonce)).toMatchObject({ baselineAt: initialReset.baselineAt, resetId: initialReset.resetId })
     expect((await action<AdminDashboard>(admin, 'dashboard')).admitted).toBe(2)
     const second = await reset(admin)
     expect(second.resetId).not.toBe(initialReset.resetId)
