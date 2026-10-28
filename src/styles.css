@@ -138,13 +138,14 @@ h1 em { font-weight: 400; color: #ceb4ce; }
 @keyframes pill-shimmer-drift { from { opacity: .12; transform: translateX(35%) skewX(-25deg); } 48% { opacity: .28; } to { opacity: .13; transform: translateX(310%) skewX(-25deg); } }
 @media (min-width: 1600px) { .ticket-stage, .ticket-presentation { --ticket-width: 600px; } }
 @media (max-width: 600px) {
-  .experience { padding: max(16px, env(safe-area-inset-top)) 22px max(20px, env(safe-area-inset-bottom)); }
+  .experience { --hero-space: clamp(14px, 4vw, 17px); --hero-breath: calc(2 * var(--hero-space)); padding: max(16px, env(safe-area-inset-top)) 22px max(20px, env(safe-area-inset-bottom)); }
   .masthead>.eyebrow { font-size: 7px; letter-spacing: .16em; }
   .info-button { font-size: 10px; white-space: nowrap; flex-shrink: 0; }
-  .intro { margin-top: 4px; }
+  .intro { margin-top: var(--hero-breath); }
   h1 { font-size: clamp(25px, 8.2vw, 48px); letter-spacing: -.055em; }
-  .intro-kicker { font-size: 7px; margin-bottom: 4px; }
-  .invitation-heading { margin-top: 6px; }
+  h1 em { padding-inline-start: .16em; }
+  .intro-kicker { font-size: 7px; margin-bottom: var(--hero-space); }
+  .invitation-heading { margin-top: var(--hero-breath); }
   .collection-label { font-size: 7px; gap: 12px; }
   .ticket-stage, .ticket-presentation { --ticket-width: min(86vw, 500px); height: max(calc(var(--ticket-width) * var(--floating-height-ratio, 1.03) + 24px), calc(var(--ticket-width) * var(--souvenir-height-ratio, 1))); margin: 0; perspective: 1000px; }
   .ticket-presentation { perspective: none; }
