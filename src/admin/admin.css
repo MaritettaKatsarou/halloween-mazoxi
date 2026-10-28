@@ -28,3 +28,19 @@
 .admission-activity { list-style: none; padding: 0; }.admission-activity li { display: flex; justify-content: space-between; gap: 20px; padding: 16px 0; border-bottom: 1px solid #c5aabd26; font-size: 12px; }.admission-activity small { display: block; color: #cbb9c3; font-size: 10px; margin-top: 7px; }.admission-activity time { font-size: 10px; color: #cbb9c3; text-align: right; line-height: 1.7; }
 .admin-footer { border-top: 1px solid #c5aabd26; padding-top: 20px; margin-top: 50px; font-size: 8px; letter-spacing: .15em; color: #cbb9c3; }
 @media(max-width: 450px) { .admin-brand { font-size: 19px; }.admin-counts dd { font-size: 36px; }.admin-counts { gap: 8px; }.admin-main { padding-top: 18px; } }
+.admin-dashboard h1 { white-space: normal; }
+.dashboard-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 28px; }
+.dashboard-controls>button { min-width: 0; min-height: 48px; margin: 0; padding: 14px 8px; font-size: clamp(8px, 2.5vw, 10px); letter-spacing: .1em; }
+.admin-reset-button { border-color: #d5b09b80; background: #d5b09b0d; color: #f1d9c4; }
+.dashboard-baseline { border-bottom: 1px solid #c5aabd26; padding-bottom: 18px; }
+.dashboard-history { margin-top: 28px; border-block: 1px solid #c5aabd30; }
+.dashboard-history>summary { cursor: pointer; padding: 18px 0; font-size: 12px; color: #e2c6b4; }
+.dashboard-history h3 { font: 21px Georgia, serif; color: #e2c6b4; margin-top: 28px; }
+.reset-audit { padding: 0; list-style: none; font-size: 12px; }
+.reset-audit li { padding: 12px 0; border-bottom: 1px solid #c5aabd26; }
+.reset-audit small { display: block; margin-top: 6px; overflow-wrap: anywhere; font-size: 9px; color: #cbb9c3; }
+.admin-reset-dialog { width: min(460px, calc(100vw - 32px)); max-height: calc(100svh - 32px); margin: auto; overflow-y: auto; padding: clamp(20px, 5vw, 32px); color: #f2e9e1; background: #30252f; border: 1px solid #c5aabd60; border-radius: 7px; }
+.admin-reset-dialog::backdrop { background: #17121dcc; backdrop-filter: blur(3px); }
+.admin-reset-dialog h2 { margin: 12px 0 20px; font: 27px/1.2 Georgia, serif; color: #e2c6b4; }
+.admin-reset-dialog p { font-size: 12px; line-height: 1.8; color: #ded0d7; }
+.admin-reset-dialog>.eyebrow, .admin-reset-dialog .eyebrow { color: #d5b09b; font-size: 8px; letter-spacing: .16em; }

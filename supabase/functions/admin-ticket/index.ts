@@ -11,10 +11,13 @@ Deno.serve(createAdminHandler({
     return !error && data.user ? { id: data.user.id,
       permanent: data.user.is_anonymous === false && !!data.user.email && !!data.user.email_confirmed_at } : null
   },
-  async execute(adminId, action, credential) {
-    const { data, error } = await backend.rpc('admin_ticket_action', {
-      p_admin: adminId, p_action: action, p_credential: credential ?? null,
-    })
+  async execute(adminId, action, credential, options) {
+    const { data, error } = action === 'reset-count'
+      ? await backend.rpc('reset_admission_count', { p_admin: adminId, p_request_id: options!.requestId })
+      : action === 'history'
+      ? await backend.rpc('admin_admission_history', { p_admin: adminId,
+        p_before: options?.cursor?.redeemedAt ?? null, p_before_id: options?.cursor?.id ?? null })
+      : await backend.rpc('admin_ticket_action', { p_admin: adminId, p_action: action, p_credential: credential ?? null })
     if (error?.code === '42501') throw new AdminDenied()
     if (error) throw Error('Admin operation failed')
     return data

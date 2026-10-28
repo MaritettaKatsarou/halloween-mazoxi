@@ -40,4 +40,31 @@ describe('admin Edge trust boundary', () => {
     expect(failed.status).toBe(503)
     expect(await failed.text()).not.toContain('private detail')
   })
+  it('authorizes resets freshly, requires an idempotency UUID and never accepts a client baseline', async () => {
+    const execute = vi.fn<AdminDependencies['execute']>(async () => ({ authorized: true }))
+    const handler = createAdminHandler({ authenticate: async () => ({ id: 'admin', permanent: true }), execute })
+    const requestId = '00000000-0000-4000-8000-000000000001'
+    expect((await handler(request({ action: 'reset-count', requestId }))).status).toBe(200)
+    expect(execute).toHaveBeenLastCalledWith('admin', 'reset-count', undefined, { requestId })
+    expect(execute.mock.calls[0]).toEqual(['admin', 'session'])
+    for (const body of [{ action: 'reset-count' }, { action: 'reset-count', requestId: 'bad' },
+      { action: 'reset-count', requestId, baselineAt: '2026-10-31' },
+      { action: 'reset-count', requestId, credential: 'HM-1' }, { action: 'admit', requestId }]) {
+      expect((await handler(request(body))).status).toBe(400)
+    }
+    const guest = createAdminHandler({ authenticate: async () => ({ id: 'guest', permanent: false }), execute })
+    const denied = createAdminHandler({ authenticate: async () => ({ id: 'revoked', permanent: true }), execute: async () => { throw new AdminDenied() } })
+    expect((await guest(request({ action: 'reset-count', requestId }))).status).toBe(403)
+    expect((await denied(request({ action: 'reset-count', requestId }))).status).toBe(403)
+  })
+  it('only accepts bounded, typed history cursors after authorization', async () => {
+    const execute = vi.fn<AdminDependencies['execute']>(async () => ({}))
+    const handler = createAdminHandler({ authenticate: async () => ({ id: 'admin', permanent: true }), execute })
+    const cursor = { id: '00000000-0000-4000-8000-000000000001', redeemedAt: '2026-10-31T18:00:00.123456+00:00' }
+    expect((await handler(request({ action: 'history', cursor }))).status).toBe(200)
+    expect(execute).toHaveBeenLastCalledWith('admin', 'history', undefined, { cursor })
+    for (const value of [null, {}, { ...cursor, id: 'bad' }, { ...cursor, redeemedAt: 'invalid' }, { ...cursor, admin: 'attacker' }]) {
+      expect((await handler(request({ action: 'history', cursor: value }))).status).toBe(400)
+    }
+  })
 })

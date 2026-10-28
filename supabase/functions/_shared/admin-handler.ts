@@ -5,13 +5,21 @@ export type AdminTicket = {
 export type AdmissionResult = { result: 'INVALID' } | { result: 'VALID' | 'ADMITTED' | 'ALREADY_USED'; ticket: AdminTicket }
 export type AdminDashboard = {
   total: number; admitted: number; remaining: number
+  baselineAt: string | null; lifetimeAdmitted: number
   distribution: { editionId: string; total: number; admitted: number }[]
   recent: Pick<AdminTicket, 'id' | 'editionId' | 'displayNumber' | 'redeemedAt' | 'redeemedBy'>[]
 }
-export type AdminAction = 'session' | 'dashboard' | 'validate' | 'admit'
+export type HistoryCursor = { redeemedAt: string; id: string }
+export type AdminHistory = {
+  items: AdminDashboard['recent']; nextCursor: HistoryCursor | null
+  resets: { id: string; baselineAt: string; resetBy: string }[]
+}
+export type ResetCountResult = { baselineAt: string; resetId: string }
+export type AdminAction = 'session' | 'dashboard' | 'validate' | 'admit' | 'reset-count' | 'history'
+export type AdminOperationOptions = { requestId?: string; cursor?: HistoryCursor }
 export type AdminDependencies = {
   authenticate: (token: string) => Promise<{ id: string; permanent: boolean } | null>
-  execute: (adminId: string, action: AdminAction, credential?: string) => Promise<unknown>
+  execute: (adminId: string, action: AdminAction, credential?: string, options?: AdminOperationOptions) => Promise<unknown>
 }
 export class AdminDenied extends Error {}
 
@@ -38,12 +46,28 @@ export function createAdminHandler(dependencies: AdminDependencies) {
       if (Number(request.headers.get('Content-Length') || 0) > 256) return respond({ error: 'Invalid request' }, 400)
       const text = await request.text()
       if (text.length > 256) return respond({ error: 'Invalid request' }, 400)
-      let body: { action?: AdminAction; credential?: string }
+      let body: { action?: AdminAction; credential?: string; requestId?: string; cursor?: HistoryCursor }
       try { body = JSON.parse(text) } catch { return respond({ error: 'Invalid request' }, 400) }
-      if (!body || Object.keys(body).some(key => !['action', 'credential'].includes(key))
-        || !['session', 'dashboard', 'validate', 'admit'].includes(body.action || '')) {
+      if (!body || typeof body !== 'object' || Array.isArray(body) || Object.keys(body).some(key => !['action', 'credential', 'requestId', 'cursor'].includes(key))
+        || !['session', 'dashboard', 'validate', 'admit', 'reset-count', 'history'].includes(body.action || '')) {
         return respond({ error: 'Invalid request' }, 400)
       }
+      const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      if (body.action === 'reset-count') {
+        if (typeof body.requestId !== 'string' || !uuid.test(body.requestId) || body.credential !== undefined || body.cursor !== undefined) return respond({ error: 'Invalid reset request' }, 400)
+        return respond(await dependencies.execute(user.id, 'reset-count', undefined, { requestId: body.requestId }))
+      }
+      if (body.requestId !== undefined) return respond({ error: 'Invalid request' }, 400)
+      if (body.action === 'history') {
+        const cursor = body.cursor
+        if (body.credential !== undefined || cursor !== undefined && (!cursor || typeof cursor !== 'object' || Array.isArray(cursor)
+          || Object.keys(cursor).some(key => !['redeemedAt', 'id'].includes(key))
+          || typeof cursor.id !== 'string' || !uuid.test(cursor.id) || typeof cursor.redeemedAt !== 'string'
+          || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|\+00:00)$/.test(cursor.redeemedAt)
+          || !Number.isFinite(Date.parse(cursor.redeemedAt)))) return respond({ error: 'Invalid history request' }, 400)
+        return respond(await dependencies.execute(user.id, 'history', undefined, cursor ? { cursor } : {}))
+      }
+      if (body.cursor !== undefined) return respond({ error: 'Invalid request' }, 400)
       if (body.action === 'validate' || body.action === 'admit') {
         if (typeof body.credential !== 'string' || !/^hm1_[A-Za-z0-9_-]{43}$/.test(body.credential)) {
           return respond({ result: 'INVALID' })

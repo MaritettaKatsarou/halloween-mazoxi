@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '../types/database'
-import type { AdminAction, AdminDashboard, AdmissionResult } from '../../supabase/functions/_shared/admin-handler'
-export type { AdminDashboard, AdmissionResult }
+import type { AdminAction, AdminOperationOptions } from '../../supabase/functions/_shared/admin-handler'
+export type { AdminDashboard, AdmissionResult, AdminHistory, ResetCountResult } from '../../supabase/functions/_shared/admin-handler'
 export const ADMIN_STORAGE_KEY = 'halloween-mazoxi:admin:v1'
 let client: Promise<SupabaseClient<Database>> | undefined
 export function getAdminClient() {
@@ -13,12 +13,12 @@ export function getAdminClient() {
   }))
 }
 export class AdminAccessError extends Error {}
-export async function adminRequest<T>(action: AdminAction, credential?: string): Promise<T> {
+export async function adminRequest<T>(action: AdminAction, credential?: string, options?: AdminOperationOptions): Promise<T> {
   const client = await getAdminClient()
   const { data: auth, error } = await client.auth.getSession()
   if (error || !auth.session || auth.session.user.is_anonymous) throw new AdminAccessError('Sign in with your administrator account.')
   const invoke = () => client.functions.invoke('admin-ticket', {
-    body: { action, ...(credential !== undefined ? { credential } : {}) }, timeout: 20000,
+    body: { action, ...(credential !== undefined ? { credential } : {}), ...options }, timeout: 20000,
   })
   let result = await invoke()
   if (result.error?.context instanceof Response && result.error.context.status === 401) {
@@ -29,7 +29,10 @@ export async function adminRequest<T>(action: AdminAction, credential?: string):
   if (result.error) {
     const status = result.error.context instanceof Response ? result.error.context.status : 0
     if (status === 401 || status === 403) throw new AdminAccessError('Administrator access was denied. Sign in again.')
-    throw Error('Connection interrupted. Validate the code again to check its current status.')
+    throw Error(action === 'reset-count'
+      ? 'Reset could not be confirmed. Retry this confirmation with the same request, or cancel and refresh counts to check the saved baseline. Tickets remain unchanged.'
+      : action === 'dashboard' || action === 'history' ? 'Counts could not be loaded. Please retry.'
+      : 'Connection interrupted. Validate the code again to check its current status.')
   }
   return result.data as T
 }

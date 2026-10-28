@@ -46,4 +46,13 @@ describe('admin client session isolation and login', () => {
     expect(mocks.signOut).toHaveBeenCalledWith({ scope: 'local' })
     expect(mocks.signInWithPassword).not.toHaveBeenCalled()
   })
+  it('sends a confirmed reset request ID unchanged so a retry cannot create a second baseline', async () => {
+    const { adminRequest } = await import('../src/admin/client')
+    const requestId = '00000000-0000-4000-8000-000000000001'
+    await adminRequest('reset-count', undefined, { requestId })
+    await adminRequest('reset-count', undefined, { requestId })
+    expect(mocks.invoke.mock.calls.map(call => call[1].body)).toEqual([
+      { action: 'reset-count', requestId }, { action: 'reset-count', requestId },
+    ])
+  })
 })

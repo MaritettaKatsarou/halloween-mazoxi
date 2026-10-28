@@ -56,6 +56,14 @@ export type Database = {
         Args: { p_action: string; p_admin: string; p_credential?: string }
         Returns: Json
       }
+      reset_admission_count: {
+        Args: { p_admin: string; p_request_id: string }
+        Returns: Json
+      }
+      admin_admission_history: {
+        Args: { p_admin: string; p_before?: string; p_before_id?: string }
+        Returns: Json
+      }
       issue_guest_ticket: {
         Args: { p_create?: boolean; p_owner: string }
         Returns: Json
