@@ -52,7 +52,8 @@ h1 em { font-weight: 400; color: #ceb4ce; }
 .ticket-main img { width: 100%; height: 100%; display: block; }
 .ticket-stub { position: absolute; left: var(--split); right: 0; top: 0; bottom: 0; transform-origin: 0 var(--hinge-y); }
 .ticket-stub img { position: absolute; height: 100%; width: var(--stub-image-width); max-width: none; right: 0; }
-.ticket-stub { clip-path: inset(0); }
+/* Contain the full-canvas image inside the stub before its hanging rotation. */
+.ticket-stub { clip-path: inset(0); overflow: clip; }
 .paper-hinge { position: absolute; left: calc(var(--split) - 2px); top: var(--hinge-y); transform: translateY(-50%); width: 5px; height: 5px; background: var(--paper-color); border-radius: 1px; pointer-events: none; }
 .ticket-qr { position: absolute; background: white; color: black; overflow: hidden; }
 .ticket-qr > svg, .ticket-qr > canvas, .ticket-qr > img { position: static; display: block; width: 100%; height: 100%; max-width: 100%; object-fit: contain; }

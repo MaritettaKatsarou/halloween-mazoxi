@@ -14,6 +14,7 @@ The existing `MagicOrbButton` component name and props are retained to avoid cha
 
 ## Verification
 
+- Public verification caught invisible full-canvas stub image overflow after a redeemed reload at 320px. `overflow: clip` on the stub contains that image before rotation; it does not clip the stage or alter the paper hinge, tear path or QR geometry. The release is rechecked and redeployed with this fix.
 - 108 automated tests pass. Typecheck, ESLint and production build pass. All 12 original artwork checks and the byte-identical Mystery asset check pass.
 - 62 headless Edge layout/interaction checks pass across 320, 375, 390 and 430px portrait widths, 667×375 and 844×390 landscape, plus desktop. They verify the horizontal capsule, a minimum 44px touch target, internal centered readable label, no overflow, hover, nonuniform horizon, shimmer, press displacement/release settling, reduced motion and preserved guest actions.
 - Synthetic guest-flow tests verify exactly one claim, QR decoding, return to floating, original hanging admission, unchanged quote and disabled admitted state. No production data or real tickets were created/modified.
