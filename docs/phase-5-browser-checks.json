@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "browser": "Headless Microsoft Edge",
+  "checks": [
+    "Landing renders without a fatal error",
+    "Gradient/grain and ticket firelight layers render",
+    "All 12 artworks decode at original natural dimensions in the deployed browser",
+    "Automatic ticket rotation advances in the rendered browser",
+    "Production-origin claim returns a real ticket and QR",
+    "Disposable production guest is explicitly tagged",
+    "Claimed edition uses the correct original image and both image fragments load",
+    "QR remains nested inside its physical ticket stub",
+    "Actual rendered scan-ready QR decodes to the issued credential",
+    "Reload preserves the actual ticket, edition and QR in the browser",
+    "Private guest Realtime subscription receives a successful join reply",
+    "No document horizontal overflow at 320px",
+    "No document horizontal overflow at 390px",
+    "No document horizontal overflow at 430px",
+    "Unauthenticated protected dashboard redirects to admin login",
+    "Admin route does not replace the guest session",
+    "HTTPS admin login form renders",
+    "Direct admin path recovers into the correct hash route in a real browser",
+    "Guest ticket restores after navigating through admin routes",
+    "Production exposes no development admission controls",
+    "No uncaught browser page errors"
+  ],
+  "pageErrors": [],
+  "disposableTicket": "HM-13",
+  "edition": "cat-pumpkin-stack"
+}
