@@ -53,7 +53,7 @@ Production simulation is unavailable by design. Never reset admission state thro
 
 ## Test record ledger and cleanup
 
-One new disposable guest was created by the production browser test and tagged privately with `phase5_test_run`. Exact ticket/owner UUIDs and the run identifier remain in the ignored local `.artifacts/phase5-browser-report.json` ledger; they are omitted from the public report.
+Production browser testing created the disposable guests below. HM-13 is tagged privately with `phase5_test_run`; HM-14–16 use `phase5_admin_browser_run`. Exact ticket/owner UUIDs and run identifiers remain in ignored local `.artifacts/phase5-browser-report.json`, `phase5-admin-browser-attempt1.json` and `phase5-admin-browser-report.json` ledgers; they are omitted from the public report.
 
 | Disposable ticket | Edition | Final status |
 | --- | --- | --- |
