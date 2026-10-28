@@ -28,7 +28,7 @@ main { max-width: 1100px; margin: auto; }
 .intro { text-align: center; margin-top: clamp(38px, 6vh, 80px); position: relative; z-index: 1; }
 .intro-kicker { display: flex; gap: 14px; justify-content: center; align-items: center; color: #d5b09b; margin: 0 0 20px; }
 .tiny-line { width: 24px; height: 1px; background: #c9a18d70; }
-h1 { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(39px, 6.6vw, 88px); font-weight: 400; line-height: 1.1; letter-spacing: -.065em; margin: 0; }
+h1 { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(39px, 6.6vw, 88px); font-weight: 400; line-height: 1.1; letter-spacing: -.065em; margin: 0; white-space: nowrap; }
 h1 em { font-weight: 400; color: #ceb4ce; }
 .title-dot { color: #d89b75; }
 .invitation-heading { position: relative; z-index: 2; max-width: 780px; margin: 28px auto 0; }
@@ -111,7 +111,7 @@ h1 em { font-weight: 400; color: #ceb4ce; }
 .preview-note { font-size: 9px; color: #baa6b0; margin: 13px 0 12px; }
 .text-button { color: #c8b5be; border: 0; background: none; font-size: 10px; padding: 10px; min-height: 44px; }
 .text-button span { padding-left: 9px; color: #d5b09b; }
-.claimed-actions .eyebrow { color: #d5b09b; margin-bottom: 12px; }
+.claimed-actions .eyebrow { color: #d5b09b; margin: 10px 0 0; }
 .event-note { overflow: hidden; font-size: 12px; line-height: 1.6; color: #ded0d7; }
 .event-note-content { margin-bottom: 10px; padding: 16px 18px; border: 1px solid #c5aabd26; border-radius: 7px; background: linear-gradient(135deg, #3c2e3d, #2c242f); }
 .event-note-content>.eyebrow { margin: 0 0 10px; color: #d5b09b; }
@@ -140,14 +140,12 @@ h1 em { font-weight: 400; color: #ceb4ce; }
 @media (max-width: 600px) {
   .experience { padding: max(16px, env(safe-area-inset-top)) 22px max(20px, env(safe-area-inset-bottom)); }
   .masthead>.eyebrow { font-size: 7px; letter-spacing: .16em; }
-  .info-button { font-size: 10px; }
+  .info-button { font-size: 10px; white-space: nowrap; flex-shrink: 0; }
   .intro { margin-top: 4px; }
-  h1 { font-size: clamp(37px, 10vw, 58px); }
-  h1 em { display: block; font-size: 1.2em; line-height: 1.15; margin-top: 2px; }
-  .title-dot { display: none; }
+  h1 { font-size: clamp(25px, 8.2vw, 48px); letter-spacing: -.055em; }
   .intro-kicker { font-size: 7px; margin-bottom: 4px; }
-  .invitation-heading { margin-top: 8px; }
-  .collection-label { font-size: 7px; }
+  .invitation-heading { margin-top: 6px; }
+  .collection-label { font-size: 7px; gap: 12px; }
   .ticket-stage, .ticket-presentation { --ticket-width: min(86vw, 500px); height: max(calc(var(--ticket-width) * var(--floating-height-ratio, 1.03) + 24px), calc(var(--ticket-width) * var(--souvenir-height-ratio, 1))); margin: 0; perspective: 1000px; }
   .ticket-presentation { perspective: none; }
   .ticket-float { transition: width 1.05s ease; }
@@ -156,7 +154,7 @@ h1 em { font-weight: 400; color: #ceb4ce; }
   .ticket-tools { margin: 0; }
   .ticket-caption { font-size: 9px; gap: 7px; }
   .orb-button { width: min(290px, 100%); min-height: 60px; padding: 18px 24px; font-size: 11px; font-weight: 500; letter-spacing: .13em; }
-  .claimed-actions .eyebrow { margin: 0 0 4px; }
+  .claimed-actions .eyebrow { margin: 8px 0 0; }
   .preview-note { font-size: 8px; line-height: 1.5; margin: 12px 0 0; }
   .preview-note.is-quiet { position: absolute; width: 1px; height: 1px; margin: 0; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .back-title { font-size: 26px; }
