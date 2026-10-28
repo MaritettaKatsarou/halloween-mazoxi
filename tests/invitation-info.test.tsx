@@ -12,6 +12,7 @@ describe('final invitation information', () => {
     expect(event.timeZone).toBe('Europe/Athens')
     expect(event.display).toEqual({ date: '31 Οκτ 2026', time: '07:00 μμ' })
     expect(event.location).toBe('Αμφιτρίτης 18, Παλαιο Φάληρο')
+    expect(event.invitation.closing).toBe('Βάλε ό,τι σου αρέσει και κράτα το εισιτήριό σου για την είσοδο. Τα λέμε εκεί.')
   })
   it('renders the exact short invitation, semantic detail rows and accessible copy control', () => {
     const html = renderToStaticMarkup(createElement(InvitationInfo, { open: true }))

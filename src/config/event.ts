@@ -10,6 +10,6 @@ export const event = {
   },
   invitation: {
     headline: "Let's dress up and have fun !",
-    closing: 'Φόρε ό,τι σου αρέσει και κράτα το εισιτήριό σου για την είσοδο. Τα λέμε εκεί.',
+    closing: 'Βάλε ό,τι σου αρέσει και κράτα το εισιτήριό σου για την είσοδο. Τα λέμε εκεί.',
   },
 } as const
