@@ -1,0 +1,50 @@
+{
+  "passed": true,
+  "browser": "Headless Microsoft Edge",
+  "camera": "Synthetic video frames and injected permission-denial error; no physical camera",
+  "checks": [
+    "Production password login authenticates the approved permanent test admin",
+    "Admin login leaves the active anonymous guest session intact",
+    "Authorized production dashboard renders consistent real counts",
+    "Dashboard displays all 12 actual editions",
+    "Production-origin anonymous guest cannot invoke admin redemption",
+    "Scanner explains a simulated camera-permission denial",
+    "Scanner decodes a synthetic video stream of the guest QR and validates the correct ticket",
+    "Actual assigned artwork decodes before admission is enabled",
+    "Successful detection stops the synthetic camera stream and pauses scanning",
+    "One detected QR triggers exactly one validation request",
+    "Scanning and validation alone do not redeem the guest ticket",
+    "Genuine production admission reaches the guest live and enters ANIMATING",
+    "Guest reaches permanent REDEEMED with its existing ADMITTED treatment",
+    "Rendered hanging stub settles at the configured angle below the ticket inside the mobile viewport",
+    "Refresh restores the final redeemed souvenir without replaying the tear",
+    "Automatic spinning stays disabled after refresh",
+    "Second scan of the original credential returns ALREADY USED with no ADMIT action",
+    "Dashboard records exactly one admission after the repeated scan",
+    "Disconnected guest does not fabricate admission while offline",
+    "Reconnection recovers the committed admission with reduced motion and final hanging state",
+    "Offline admission remains redeemed after the returning guest refreshes",
+    "Dashboard totals match exactly two new disposable admissions",
+    "Authenticated production browser flow has no uncaught page errors",
+    "Existing authenticated admin is denied immediately after its allowlist is disabled"
+  ],
+  "errors": [],
+  "temporaryAdminDisabled": true,
+  "disposableTickets": [
+    {
+      "number": "HM-14",
+      "edition": "cat-eyes",
+      "status": "redeemed"
+    },
+    {
+      "number": "HM-15",
+      "edition": "three-ghosts",
+      "status": "redeemed"
+    },
+    {
+      "number": "HM-16",
+      "edition": "moon-castle",
+      "status": "redeemed"
+    }
+  ]
+}
