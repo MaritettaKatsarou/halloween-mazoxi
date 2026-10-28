@@ -30,12 +30,13 @@ beforeAll(async () => {
     create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to authenticated;`)
   await prepareRealtimeSchema(db)
   const files = readdirSync('supabase/migrations').filter(f => f.endsWith('.sql')).sort()
-  for (const file of files.slice(0, -1)) await db.exec(readFileSync('supabase/migrations/' + file, 'utf8'))
+  const snapshotIndex = files.findIndex(file => file.endsWith('_counting_period_snapshots.sql'))
+  for (const file of files.slice(0, snapshotIndex)) await db.exec(readFileSync('supabase/migrations/' + file, 'utf8'))
   await db.query('insert into auth.users(id,is_anonymous,email,email_confirmed_at) values($1,false,$2,now()),($3,true,null,null),($4,false,$5,now())', [admin, 'fixture@example.invalid', guest, denied, 'denied@example.invalid'])
   await db.query('insert into private.admin_users(user_id) values($1),($2)', [admin, guest])
   await issue(); await issue(); await issue(); await admit(tokens[0])
   legacyBaseline = (await db.query<{ baseline_at: string }>('insert into private.admission_count_resets(request_id,reset_by) values($1,$2) returning baseline_at::text', [randomUUID(), admin])).rows[0].baseline_at
-  await db.exec(readFileSync('supabase/migrations/' + files.at(-1), 'utf8'))
+  for (const file of files.slice(snapshotIndex)) await db.exec(readFileSync('supabase/migrations/' + file, 'utf8'))
 })
 afterAll(async () => { await db?.close() })
 
