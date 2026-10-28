@@ -8,8 +8,10 @@
     "test": "vitest run",
     "test:live": "node scripts/test-live.mjs",
     "artwork:check": "node scripts/check-artwork.mjs",
+    "mystery:prepare": "node scripts/prepare-mystery.mjs",
+    "mystery:check": "node scripts/check-mystery.mjs",
     "lint": "eslint .",
-    "build": "npm run artwork:check && npm run typecheck && vite build",
+    "build": "npm run artwork:check && npm run mystery:check && npm run typecheck && vite build",
     "preview": "vite preview --host 127.0.0.1"
   },
   "keywords": [],

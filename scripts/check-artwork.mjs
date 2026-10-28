@@ -26,6 +26,7 @@ for (const edition of collection.editions) {
   assert.ok(qr.x + qr.width <= width && qr.y + qr.height <= height, `${id}: QR outside canvas`)
   console.log(`${id}: ${width}×${height}, SHA-256 ${hash}`)
 }
-const originals = (await readdir(new URL('public/tickets/', root))).filter(file => file.endsWith('.png'))
+const presentationOnly = new Set(['mystery-source.png', 'mystery-ticket.png'])
+const originals = (await readdir(new URL('public/tickets/', root))).filter(file => file.endsWith('.png') && !presentationOnly.has(file))
 assert.equal(originals.length, files.size, 'Unregistered PNG files: review the complete artwork inventory')
 console.log(`Verified ${ids.size}/${collection.expectedOriginalCount} unique original PNGs, canvas dimensions, QR bounds and lower attachment positions.`)

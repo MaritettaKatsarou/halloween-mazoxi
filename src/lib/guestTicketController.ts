@@ -1,16 +1,18 @@
 import type { GuestTicket } from './guestTickets'
 export type AdmissionPhase = 'ISSUED' | 'ANIMATING' | 'REDEEMED'
-export type GuestView = { ticket: GuestTicket | null; admissionPhase: AdmissionPhase; loading: boolean; error: string | null }
+export type GuestResolution = 'restoring' | 'unclaimed' | 'owned' | 'error'
+export type GuestView = { ticket: GuestTicket | null; resolution: GuestResolution; admissionPhase: AdmissionPhase; loading: boolean; error: string | null }
 type Cleanup = () => void
 export type GuestControllerDependencies = {
   load: () => Promise<GuestTicket | null>
   claim: () => Promise<GuestTicket | null>
   subscribe: (ticket: GuestTicket, notify: () => void) => Promise<Cleanup>
   observeSession: (changed: (ownerId: string | null) => void) => Promise<Cleanup>
+  prepareArtwork?: (ticket: GuestTicket) => Promise<void>
 }
 
 export function createGuestTicketController(dependencies: GuestControllerDependencies) {
-  let state: GuestView = { ticket: null, admissionPhase: 'ISSUED', loading: true, error: null }
+  let state: GuestView = { ticket: null, resolution: 'restoring', admissionPhase: 'ISSUED', loading: true, error: null }
   const listeners = new Set<() => void>()
   let active = false, generation = 0, subscriptionVersion = 0, lifecycle = 0
   let knownOwner: string | null = null, channelKey: string | null = null
@@ -42,7 +44,7 @@ export function createGuestTicketController(dependencies: GuestControllerDepende
     const admissionPhase: AdmissionPhase = next?.status === 'redeemed'
       ? same && previous.status === 'issued' ? 'ANIMATING' : same ? state.admissionPhase : 'REDEEMED'
       : 'ISSUED'
-    emit({ ticket: next, admissionPhase, error: null })
+    emit({ ticket: next, resolution: next ? 'owned' : 'unclaimed', admissionPhase, error: null })
     if (next) { knownOwner = next.ownerId; attach(next) } else detach()
   }
   function refresh(): Promise<void> {
@@ -53,23 +55,29 @@ export function createGuestTicketController(dependencies: GuestControllerDepende
       while (pending && active && !claiming) {
         pending = false
         const version = generation
-        emit({ loading: !state.ticket, error: null })
-        try { const result = await dependencies.load(); if (active && generation === version) accept(result) }
-        catch (error) { if (active && generation === version) emit({ error: error instanceof Error ? error.message : 'Η σύνδεση απέτυχε.' }) }
+        emit({ loading: !state.ticket, error: null, resolution: state.resolution === 'error' ? 'restoring' : state.resolution })
+        try {
+          const result = await dependencies.load()
+          if (!active || generation !== version) continue
+          if (result && (result.id !== state.ticket?.id || result.editionId !== state.ticket?.editionId)) await dependencies.prepareArtwork?.(result)
+          if (active && generation === version) accept(result)
+        }
+        catch (error) { if (active && generation === version) emit({ resolution: state.ticket ? 'owned' : 'error', error: error instanceof Error ? error.message : 'Η σύνδεση απέτυχε.' }) }
       }
     })().finally(() => { running = null; if (active) emit({ loading: false }); if (pending && active && !claiming) void refresh() })
     return running
   }
   async function claim() {
-    if (!active || claiming || running) return false
+    if (!active || claiming || running || state.resolution !== 'unclaimed') return false
     claiming = true; const version = generation
     emit({ loading: true, error: null })
     try {
       const result = await dependencies.claim()
+      if (active && version === generation && result) await dependencies.prepareArtwork?.(result)
       if (active && version === generation) { accept(result); return true }
       return false
     } catch (error) {
-      if (active && version === generation) emit({ error: error instanceof Error ? error.message : 'Η έκδοση απέτυχε.' })
+      if (active && version === generation) emit({ resolution: state.ticket ? 'owned' : 'error', error: error instanceof Error ? error.message : 'Η έκδοση απέτυχε.' })
       return false
     } finally { claiming = false; if (active) { emit({ loading: false }); if (pending) void refresh() } }
   }
@@ -77,7 +85,7 @@ export function createGuestTicketController(dependencies: GuestControllerDepende
     if (!active) return
     if ((knownOwner && knownOwner !== ownerId) || (state.ticket && state.ticket.ownerId !== ownerId)) {
       generation++; detach()
-      emit({ ticket: null, admissionPhase: 'ISSUED', error: null, loading: true })
+      emit({ ticket: null, resolution: 'restoring', admissionPhase: 'ISSUED', error: null, loading: true })
     }
     knownOwner = ownerId
     void refresh()

@@ -17,6 +17,65 @@ function fixture(initial: GuestTicket | null = issued) {
   return { controller, stop, load, cleanup, set: (ticket: GuestTicket | null) => { current = ticket }, notify: () => notify(), auth: (id: string | null) => auth(id) }
 }
 describe('authoritative guest admission state machine', () => {
+  it('starts unresolved and confirms unclaimed only after successful lookup', async () => {
+    let resolve!: (ticket: GuestTicket | null) => void
+    const controller = createGuestTicketController({ load: () => new Promise(done => { resolve = done }), claim: async () => issued,
+      subscribe: async () => () => {}, observeSession: async () => () => {},
+    })
+    expect(controller.snapshot().resolution).toBe('restoring')
+    const stop = controller.start()
+    expect(controller.snapshot().ticket).toBeNull(); expect(await controller.claim()).toBe(false)
+    resolve(null); await tick()
+    expect(controller.snapshot().resolution).toBe('unclaimed'); stop()
+  })
+  it('does not expose owned artwork until decoding completes', async () => {
+    let decoded!: () => void
+    const controller = createGuestTicketController({ load: async () => issued, claim: async () => issued,
+      prepareArtwork: () => new Promise(resolve => { decoded = resolve }),
+      subscribe: async () => () => {}, observeSession: async () => () => {},
+    })
+    const stop = controller.start(); await tick()
+    expect(controller.snapshot().resolution).toBe('restoring'); expect(controller.snapshot().ticket).toBeNull()
+    decoded(); await tick()
+    expect(controller.snapshot().resolution).toBe('owned'); expect(controller.snapshot().ticket).toEqual(issued); stop()
+  })
+  it('keeps confirmed unclaimed presentation during claim and image preparation without issuing twice', async () => {
+    let decoded!: () => void
+    const claim = vi.fn(async () => issued)
+    const controller = createGuestTicketController({ load: async () => null, claim,
+      prepareArtwork: () => new Promise(resolve => { decoded = resolve }),
+      subscribe: async () => () => {}, observeSession: async () => () => {},
+    })
+    const stop = controller.start(); await tick()
+    const pending = controller.claim(); await tick()
+    expect(controller.snapshot().resolution).toBe('unclaimed'); expect(controller.snapshot().loading).toBe(true)
+    expect(await controller.claim()).toBe(false); decoded(); expect(await pending).toBe(true)
+    expect(claim).toHaveBeenCalledOnce(); expect(controller.snapshot().resolution).toBe('owned'); stop()
+  })
+  it('failed restore and failed decoding remain retryable errors, never unclaimed', async () => {
+    const load = vi.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValue(issued)
+    const prepareArtwork = vi.fn().mockRejectedValueOnce(new Error('image unavailable')).mockResolvedValue(undefined)
+    const claim = vi.fn()
+    const controller = createGuestTicketController({ load, claim, prepareArtwork,
+      subscribe: async () => () => {}, observeSession: async () => () => {},
+    })
+    const stop = controller.start(); await tick()
+    expect(controller.snapshot().resolution).toBe('error'); expect(await controller.claim()).toBe(false)
+    await controller.refresh(); expect(controller.snapshot().resolution).toBe('error')
+    await controller.refresh(); expect(controller.snapshot().resolution).toBe('owned')
+    expect(claim).not.toHaveBeenCalled(); stop()
+  })
+  it('ignores a former owner whose image finishes decoding after an account switch', async () => {
+    let auth!: (id: string | null) => void, decoded!: () => void
+    let current: GuestTicket = issued
+    const controller = createGuestTicketController({ load: async () => current, claim: async () => current,
+      prepareArtwork: vi.fn().mockImplementationOnce(() => new Promise<void>(resolve => { decoded = resolve })).mockResolvedValue(undefined),
+      subscribe: async () => () => {}, observeSession: async callback => { auth = callback; return () => {} },
+    })
+    const stop = controller.start(); await tick(); auth('owner-a')
+    current = { ...issued, id: 'ticket-b', ownerId: 'owner-b' }; auth('owner-b'); decoded(); await tick()
+    expect(controller.snapshot().ticket?.id).toBe('ticket-b'); expect(controller.snapshot().resolution).toBe('owned'); stop()
+  })
   it('treats events only as hints and plays a genuine transition once', async () => {
     const f = fixture(); await tick()
     f.notify(); await tick(); expect(f.controller.snapshot().admissionPhase).toBe('ISSUED')

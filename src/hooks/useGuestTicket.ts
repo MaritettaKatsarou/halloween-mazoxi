@@ -2,10 +2,18 @@ import { useEffect, useState, useSyncExternalStore } from 'react'
 import { claimGuestTicket, loadGuestTicket } from '../lib/guestTickets'
 import { createGuestTicketController } from '../lib/guestTicketController'
 import { observeGuestSession, subscribeToAdmission } from '../lib/admissionRealtime'
+import { editions } from '../config/editions'
+import { artworkUrl } from '../lib/artworkUrl'
+import { preloadArtwork } from '../lib/preloadArtwork'
 
 export function useGuestTicket() {
   const [controller] = useState(() => createGuestTicketController({
     load: loadGuestTicket, claim: claimGuestTicket, subscribe: subscribeToAdmission, observeSession: observeGuestSession,
+    prepareArtwork: ticket => {
+      const edition = editions.find(edition => edition.id === ticket.editionId)
+      if (!edition) return Promise.reject(new Error('The assigned ticket edition is unavailable. Please retry.'))
+      return preloadArtwork(artworkUrl(edition.file))
+    },
   }))
   const state = useSyncExternalStore(controller.subscribe, controller.snapshot, controller.snapshot)
   useEffect(() => {

@@ -38,10 +38,10 @@ describe('persistent ticket reverse copy', () => {
       expect(html).not.toContain('quote-title')
     }
   })
-  it('uses the exact updated index and two-line footer', () => {
+  it('uses the exact updated index and single-line footer', () => {
     const html = renderToStaticMarkup(createElement(TicketBack, { ticketId: 'fixture' }))
     expect(html).toContain('HALLOWEEN ΜΑΖΩΞΗ 2026 · PRIVATE INVITATION')
-    expect(html).toContain('<span class="back-footer">COME AS YOU ARE.<br/>OR AS SOMEONE ELSE.</span>')
+    expect(html).toContain('<span class="back-footer">COME AS YOU ARE. OR AS SOMEONE ELSE.</span>')
     expect(html).not.toContain('Ένα μικρό ενθύμιο.')
   })
 })
