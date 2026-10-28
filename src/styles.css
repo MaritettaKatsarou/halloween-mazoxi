@@ -60,9 +60,13 @@ h1 em { font-weight: 400; color: #ceb4ce; }
 .scan-ready span { font-size: 11px; }
 .ticket-error { max-width: 380px; margin: 12px auto; font-size: 12px; line-height: 1.7; color: #f1c5ad; }
 .ticket-back { transform: rotateY(180deg) translateZ(1px); border-radius: 20px; background: #c8a5c8; color: #29202c; padding: 6%; display: flex; flex-direction: column; justify-content: space-between; box-shadow: inset 0 0 0 1px #291e2d, inset 0 0 0 5px #c8a5c8, inset 0 0 0 6px #291e2d55, 0 18px 25px #100c124d; }
+.ticket-back { container-type: inline-size; }
 .back-index { font-size: clamp(5px, .65vw, 9px); letter-spacing: .18em; }
 .back-title { font: clamp(20px, 3.6vw, 44px)/.95 Georgia, serif; letter-spacing: -.05em; }
-.back-footer { font-size: clamp(5px, .7vw, 9px); }
+.back-title.quote-title { font-size: clamp(12px, 10.5cqw, 44px); }
+.back-title.quote-title-compact { font-size: clamp(12px, 9.2cqw, 40px); }
+.back-quote-line { display: block; white-space: nowrap; }
+.back-footer { font-size: clamp(5px, .7vw, 9px); line-height: 1.2; }
 .admitted-stamp { position: absolute; left: 4%; top: calc(100% + 16px); display: flex; flex-direction: column; align-items: flex-start; gap: 6px; color: #e2c6b4; font-size: clamp(8px, 1vw, 10px); letter-spacing: .24em; font-weight: 500; line-height: 1; pointer-events: none; }
 .admitted-stamp::before { content: ''; width: 24px; height: 1px; margin-bottom: 2px; background: #d5b09b80; }
 .admitted-stamp span { color: #ceb4ce; font: italic clamp(10px, 1.5vw, 14px)/1.2 Georgia, serif; letter-spacing: .02em; }

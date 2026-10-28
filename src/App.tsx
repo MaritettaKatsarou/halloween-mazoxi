@@ -34,7 +34,7 @@ export function App() {
     <main>
       <div className="intro"><p className="eyebrow intro-kicker"><span className="tiny-line" /> YOU’RE ON THE LIST <span className="tiny-line" /></p><h1>Halloween <em>μαζωξη</em><span className="title-dot">.</span></h1><p className="intro-copy">Μια νύχτα έξω απ’ τα συνηθισμένα.</p></div>
       <div className="collection-label"><span>THE INVITATION</span><span>EDITION {String(editions.indexOf(edition) + 1).padStart(2, '0')} / {String(editions.length).padStart(2, '0')}</span></div>
-      <Ticket key={previewKey} edition={edition} admitted={admitted} stable={scanReady} paused={paused} reveal={reveal}
+      <Ticket key={previewKey} edition={edition} ticketId={ticket?.id} admitted={admitted} stable={scanReady} paused={paused} reveal={reveal}
         admissionPhase={ticket?.status === 'redeemed' ? admissionPhase : simulatedAdmission && simulation ? simulation.phase : 'ISSUED'}
         onAdmissionComplete={() => { if (ticket?.status === 'redeemed') finishAnimation(ticket.id); else if (simulatedAdmission) setSimulation({ key: previewKey, phase: 'REDEEMED' }) }}
         qrContent={credential ? <TicketQR credential={credential} /> : ticket || reviewing || admitted ? <span className="qr-inactive">{admitted ? 'ADMITTED' : 'ARTWORK PREVIEW'}</span> : undefined} />

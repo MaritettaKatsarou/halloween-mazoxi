@@ -6,10 +6,11 @@ import { artworkLayout } from '../lib/artworkLayout'
 import { artworkUrl } from '../lib/artworkUrl'
 import type { AdmissionPhase } from '../lib/guestTicketController'
 import { ADMISSION_SETTLE_SECONDS, HANGING_ANGLE, HANGING_KEYFRAMES, TEAR_SECONDS } from '../lib/admissionGeometry'
+import { TicketBack } from './TicketBack'
 
 // Issued tickets supply a real QR with its own quiet zone; simulation never creates a credential.
-type Props = { edition: TicketEdition; admitted: boolean; stable: boolean; paused: boolean; reveal: boolean; qrContent?: ReactNode; admissionPhase?: AdmissionPhase; onAdmissionComplete?: () => void }
-export function Ticket({ edition, admitted, stable, paused, reveal, qrContent, admissionPhase, onAdmissionComplete }: Props) {
+type Props = { edition: TicketEdition; ticketId?: string; admitted: boolean; stable: boolean; paused: boolean; reveal: boolean; qrContent?: ReactNode; admissionPhase?: AdmissionPhase; onAdmissionComplete?: () => void }
+export function Ticket({ edition, ticketId, admitted, stable, paused, reveal, qrContent, admissionPhase, onAdmissionComplete }: Props) {
   const phase = admissionPhase ?? (admitted ? 'REDEEMED' : 'ISSUED')
   const final = phase === 'REDEEMED'
   const { rotateX, rotateY, rotateZ, handlers } = useTicketRotation(stable || admitted, paused, final)
@@ -39,7 +40,7 @@ export function Ticket({ edition, admitted, stable, paused, reveal, qrContent, a
               </motion.div>
               {admitted && <><div className="paper-hinge" />{animateTear && <div className="tear-light" style={{ animationDelay: `${delay - .15}s` }} />}<motion.span className="admitted-stamp" initial={animateTear ? { opacity: 0, y: 5 } : false} animate={{ opacity: 1, y: 0 }} transition={{ delay: animateTear ? delay + 1.25 : 0, duration: animateTear ? .6 : 0 }}>ADMITTED<span>Keep the night.</span></motion.span></>}
             </div>
-            <div className="ticket-face ticket-back" aria-hidden="true"><span className="back-index">HALLOWEEN ΜΑΖΩΞΗ · PRIVATE INVITATION</span><span className="back-title">Η νύχτα<br /><i>μάς ανήκει.</i></span><span className="back-footer">Ένα μικρό ενθύμιο. Μια μεγάλη νύχτα.</span></div>
+            <TicketBack ticketId={ticketId} />
           </motion.div>
         </motion.div>
       </motion.div>
