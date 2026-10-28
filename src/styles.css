@@ -72,6 +72,7 @@ h1 em { font-weight: 400; color: #ceb4ce; }
 .back-title { font: clamp(20px, 3.6vw, 44px)/.95 Georgia, serif; letter-spacing: -.05em; }
 .back-title.quote-title { font-size: clamp(12px, 10.5cqw, 44px); }
 .back-title.quote-title-compact { font-size: clamp(12px, 9.2cqw, 40px); }
+.back-title.mystery-teaser { font-size: clamp(12px, 8cqw, 36px); line-height: 1.02; letter-spacing: -.035em; }
 .back-quote-line { display: block; white-space: nowrap; }
 .back-footer { font-size: clamp(4px, 2cqw, 9px); line-height: 1.2; white-space: nowrap; }
 .admitted-stamp { position: absolute; left: 4%; top: calc(100% + 16px); display: flex; flex-direction: column; align-items: flex-start; gap: 6px; color: #e2c6b4; font-size: clamp(8px, 1vw, 10px); letter-spacing: .24em; font-weight: 500; line-height: 1; pointer-events: none; }

@@ -31,10 +31,12 @@ describe('persistent ticket reverse copy', () => {
       expect(title(html)).toBe(quoteForTicket(ticketId).text)
     }
   })
-  it('keeps unclaimed and Mystery titles neutral even if an ID is supplied', () => {
-    for (const props of [{}, { ticketId: 'ignored', mystery: true }]) {
+  it('shows the exact teaser only for Mystery, even if an ID is supplied', () => {
+    expect(title(renderToStaticMarkup(createElement(TicketBack)))).toBe('Η νύχταμάς ανήκει.')
+    for (const props of [{ mystery: true }, { ticketId: 'ignored', mystery: true }]) {
       const html = renderToStaticMarkup(createElement(TicketBack, props))
-      expect(title(html)).toBe('Η νύχταμάς ανήκει.')
+      expect(title(html)).toBe('Claim your ticket to discover your halloween quote')
+      expect(html).toContain('mystery-teaser')
       expect(html).not.toContain('quote-title')
     }
   })

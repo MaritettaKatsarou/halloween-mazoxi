@@ -19,7 +19,7 @@ describe('presentation-only Mystery Ticket', () => {
     expect(html.match(/<img\b/g)).toHaveLength(1)
     expect(html).toContain('width="1942" height="809"')
     expect(html).toContain('class="ticket-face ticket-back"')
-    expect(html).toContain('Η νύχτα<br/><i>μάς ανήκει.</i>')
+    expect(html).toContain('<span class="back-quote-line">Claim your ticket</span> <span class="back-quote-line">to discover your</span> <span class="back-quote-line"><i>halloween quote</i></span>')
     expect(html).not.toContain('YOUR EDITION IS STILL A SECRET.')
     expect(html).not.toMatch(/ticket-qr|ticket-stub|<svg|admitted-stamp/)
   })
